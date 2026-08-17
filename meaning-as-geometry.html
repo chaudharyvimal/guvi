@@ -478,7 +478,7 @@
       <span><b>45 min</b> &middot; online</span>
       <span><b>Audience</b> college students, freshers, 1&ndash;2 yrs</span>
       <span><b>Stack</b> Python, sentence-transformers, CPU only</span>
-      <span><b>Interaction beats</b> 4</span>
+      <span><b>Demo outputs</b> executed &amp; verified</span>
     </div>
   </header>
 
@@ -501,12 +501,12 @@
         <span class="gist">Vectors, then cosine, worked by hand.</span>
       </div>
       <div class="arc-cell">
-        <span class="len">13 MIN</span>
+        <span class="len">14 MIN</span>
         <span class="nm">Live demo</span>
         <span class="gist">Four runs, ending on a failure case.</span>
       </div>
       <div class="arc-cell">
-        <span class="len">4 MIN</span>
+        <span class="len">3 MIN</span>
         <span class="nm">This is RAG&rsquo;s engine</span>
         <span class="gist">Connect to what they want to build.</span>
       </div>
@@ -669,7 +669,7 @@ log in  vs  pizza
 
     <!-- ================= 6 ================= -->
     <article class="block">
-      <div class="clock"><span class="t">0:24</span><span class="d">13 min</span></div>
+      <div class="clock"><span class="t">0:24</span><span class="d">14 min</span></div>
       <div class="body">
         <h2>Live demo &mdash; four runs</h2>
         <p class="goal"><b>Goal</b> &nbsp;Payoff, then honesty. Every cell pre-run once before the session so the model is cached and nothing downloads on stage.</p>
@@ -719,12 +719,28 @@ print(pd.DataFrame(sim.numpy().round(2),
 
         <div class="ask">
           <span class="lbl">Ask the chat</span>
-          <p>&ldquo;Before I hit run &mdash; sentence 0 is about pizza, sentence 3 is about Python. High score or low? And what about 0 and 2, pizza vs biryani, which share <em>zero</em> words?&rdquo;</p>
+          <p>&ldquo;Before I hit run &mdash; sentence 0 is about pizza, sentence 1 is about pasta, sentence 5 is about debugging. Which pair scores higher, and roughly how much higher?&rdquo;</p>
         </div>
 
-        <p>When it runs, point at the two bright blocks on the diagonal, then at the one number that proves the whole session: pizza vs biryani, no shared words, high score.</p>
+        <div class="run">
+          <div class="cap">verified output</div>
+<pre><code>                               0     1     2     3     4     5
+I love eating pizza         1.00  <b>0.54</b>  0.24  0.10  0.19  <b>0.04</b>
+Pasta is my favourite food  0.54  1.00  0.32  0.14  0.18  0.01
+This restaurant serves gre  0.24  0.32  1.00 -0.09 -0.02 -0.02
+Python is a programming la  0.10  0.14 -0.09  1.00  0.30  0.10
+I write code every day      0.19  0.18 -0.02  0.30  1.00  0.27
+Debugging takes most of my  0.04  0.01 -0.02  0.10  0.27  1.00</code></pre>
+        </div>
 
-        <p class="say">&ldquo;Look at row 0, column 2. &lsquo;I love eating pizza&rsquo; and &lsquo;This restaurant serves great biryani&rsquo;. Not a single word in common. Ctrl+F would score that a flat zero. We&rsquo;re getting a high number, because the meanings point the same way.&rdquo;</p>
+        <p>Point at <strong>row 0, column 1</strong> and then <strong>row 0, column 5</strong>. Neither pair shares a single content word, and the scores are an order of magnitude apart.</p>
+
+        <p class="say">&ldquo;&lsquo;I love eating pizza&rsquo; and &lsquo;Pasta is my favourite food&rsquo; &mdash; 0.54. Now check the words: love, eating, pizza against pasta, favourite, food. Not one word in common. Ctrl+F scores that a flat zero. And pizza against &lsquo;Debugging takes most of my time&rsquo; &mdash; 0.04, also no shared words. Same zero overlap, completely different answers. The only thing separating them is meaning.&rdquo;</p>
+
+        <div class="watch">
+          <span class="lbl">Say this too</span>
+          <p>Biryani scores only <strong>0.24</strong> against pizza &mdash; low for two foods. Volunteer it: the sentence is framed around a <em>restaurant</em> rather than around <em>eating</em>, and that shifts its vector. &ldquo;Real embeddings are messier than the clean version on a slide.&rdquo; Naming a soft number before a sharp fresher spots it is worth more than hoping nobody looks.</p>
+        </div>
 
         <h3 style="font-family:var(--f-ui);font-size:16px;font-weight:640;margin:26px 0 8px;">Run 3 &mdash; fix the search box from minute one <span style="font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400;">&nbsp;5 min</span></h3>
 
@@ -744,7 +760,7 @@ print(pd.DataFrame(sim.numpy().round(2),
 ]
 faq_emb = model.encode(faq, convert_to_tensor=True)
 
-query = "I can't sign in to my account"
+query = "I can't log in to my account"
 
 # ---------- the old way ----------
 STOP = {"i", "my", "to", "the", "a", "is", "in", "do", "how", "can", "can't"}
@@ -762,13 +778,41 @@ for hit in util.semantic_search(q_emb, faq_emb, top_k=3)[0]:
     print(f"   {hit['score']:.3f}   {faq[hit['corpus_id']]}")</code></pre>
         </div>
 
-        <p>Keyword search matches only on <code>account</code> &mdash; so it confidently returns <em>&ldquo;How do I delete my account permanently?&rdquo;</em>. Semantic search should put the password-reset article on top, having never seen the word &ldquo;password&rdquo; in the query.</p>
+        <div class="run">
+          <div class="cap">verified output</div>
+<pre><code>KEYWORD SEARCH
+    How do I delete my account permanently?
+
+SEMANTIC SEARCH
+   0.502   How do I reset a forgotten password?
+   0.459   How do I delete my account permanently?
+   0.241   The app crashes when I upload a photo.</code></pre>
+        </div>
+
+        <p>Keyword search matches only on <code>account</code>, so it confidently returns the one article that will make things worse. Semantic search puts password-reset on top &mdash; having never seen the word &ldquo;password&rdquo; in the query.</p>
 
         <p class="say">&ldquo;Same eight articles. Same question. The old search found something &mdash; it found the <em>wrong</em> thing, and it offered to delete my account. The new one put &lsquo;reset a forgotten password&rsquo; at the top, and notice: my question never contained the word &lsquo;password&rsquo;. Not once. It matched on meaning. That&rsquo;s the session.&rdquo;</p>
 
+        <h3 style="font-family:var(--f-ui);font-size:16px;font-weight:640;margin:26px 0 8px;">Run 3b &mdash; the honest follow-up <span style="font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400;">&nbsp;1 min &middot; first to cut</span></h3>
+
+        <p>Look at that second score: <strong>0.459</strong> against a winner of <strong>0.502</strong>. Uncomfortably close. Change the phrasing slightly and <strong>the wrong answer wins outright</strong> &mdash; measured, not hypothetical.</p>
+
+        <div class="run">
+          <div class="cap">verified output &middot; retrieval failing</div>
+<pre><code>query: "I can't log in to my account"
+   0.502   How do I reset a forgotten password?
+   0.459   How do I delete my account permanently?
+
+query: "I'm locked out of my account"
+   <b>0.636   How do I delete my account permanently?</b>
+   0.539   How do I reset a forgotten password?</code></pre>
+        </div>
+
+        <p class="say">&ldquo;I changed &lsquo;can&rsquo;t log in&rsquo; to &lsquo;locked out&rsquo; &mdash; same meaning to you and me &mdash; and the wrong article jumped to first place. So retrieval is not a solved problem. This is exactly why production systems don&rsquo;t stop at cosine similarity: they take the top twenty and hand them to a slower, smarter <strong>reranker</strong> that actually reads each candidate against the question. Cosine similarity is the cheap first pass, not the final answer.&rdquo;</p>
+
         <div class="watch">
-          <span class="lbl">Verify first</span>
-          <p>These exact rankings are the plan&rsquo;s intent, not a measured result &mdash; I have not executed this code. Run it once before the session. If password-reset doesn&rsquo;t come out on top, adjust the query (&ldquo;I&rsquo;m locked out and can&rsquo;t get in&rdquo;) or trim the competing <code>account</code> lines until the contrast is clean, then freeze the corpus and don&rsquo;t touch it.</p>
+          <span class="lbl">Worth the minute</span>
+          <p>This is the highest-value 60 seconds in the session for a 1&ndash;2 years experienced audience &mdash; it's the gap between &ldquo;I did the tutorial&rdquo; and &ldquo;I've shipped this.&rdquo; Cut it only if you are genuinely out of time.</p>
         </div>
 
         <h3 style="font-family:var(--f-ui);font-size:16px;font-weight:640;margin:26px 0 8px;">Run 4 &mdash; now break it on purpose <span style="font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400;">&nbsp;3 min</span></h3>
@@ -778,9 +822,9 @@ for hit in util.semantic_search(q_emb, faq_emb, top_k=3)[0]:
         <div class="run">
           <div class="cap">demo 4 &middot; the failure mode</div>
 <pre><code>pairs = [
-    ("I love this product",     "I hate this product"),
-    ("The flight was on time",  "The flight was delayed"),
-    ("I love this product",     "This product is wonderful"),
+    ("The flight was on time",  "The flight was delayed"),     # opposites
+    ("I love this product",     "I hate this product"),        # opposites
+    ("I love this product",     "This product is wonderful"),  # genuinely similar
 ]
 
 for a, b in pairs:
@@ -788,9 +832,16 @@ for a, b in pairs:
     print(f"{s:.3f}   {a!r}  vs  {b!r}")</code></pre>
         </div>
 
-        <p>The first two pairs are opposites, and they will still score high &mdash; often close to the genuinely-similar third pair.</p>
+        <div class="run">
+          <div class="cap">verified output</div>
+<pre><code><b>0.800</b>   'The flight was on time'  vs  'The flight was delayed'
+0.698   'I love this product'     vs  'I hate this product'
+<b>0.829</b>   'I love this product'     vs  'This product is wonderful'</code></pre>
+        </div>
 
-        <p class="say">&ldquo;&lsquo;I love this product&rsquo; and &lsquo;I hate this product&rsquo; are scoring high. They mean opposite things. Why? Because these vectors capture <em>what a sentence is about</em>, far better than they capture <em>which side of it you&rsquo;re on</em>. Love and hate show up in near-identical contexts in the training text, so they land near each other. So: never build a sentiment classifier out of raw cosine similarity, and if your search has to respect a &lsquo;not&rsquo;, embeddings alone will not save you.&rdquo;</p>
+        <p>Read the first and last lines together and let the room sit with it: a pair of <strong>opposites</strong> at 0.800, a hair under a <strong>genuine match</strong> at 0.829.</p>
+
+        <p class="say">&ldquo;&lsquo;On time&rsquo; and &lsquo;delayed&rsquo; mean opposite things, and they&rsquo;re scoring 0.800 &mdash; essentially tied with a pair down there that genuinely does match, at 0.829. If you built a flight-status checker on this, it could not tell you whether your flight was fine or ruined. Why? Because these vectors capture <em>what a sentence is about</em> far better than <em>which side of it you&rsquo;re on</em>. &lsquo;On time&rsquo; and &lsquo;delayed&rsquo; appear in nearly identical contexts across the training text, so they land next to each other. Never build a sentiment classifier out of raw cosine similarity &mdash; and if your search has to respect a &lsquo;not&rsquo;, embeddings alone will not save you.&rdquo;</p>
 
         <p class="say">&ldquo;Every technique you learn has an edge like this. The engineers who get hired are the ones who know where the edge is.&rdquo;</p>
       </div>
@@ -798,7 +849,7 @@ for a, b in pairs:
 
     <!-- ================= 7 ================= -->
     <article class="block">
-      <div class="clock"><span class="t">0:37</span><span class="d">4 min</span></div>
+      <div class="clock"><span class="t">0:38</span><span class="d">3 min</span></div>
       <div class="body">
         <h2>You just built the engine inside RAG</h2>
         <p class="goal"><b>Goal</b> &nbsp;Convert a neat trick into something they recognise from job posts. This is the block that makes them stay for your next session.</p>
@@ -819,7 +870,9 @@ for a, b in pairs:
 
         <p class="say">&ldquo;That&rsquo;s Retrieval-Augmented Generation. The R and the A &mdash; the retrieval, the part that decides <em>what the model is even allowed to look at</em> &mdash; is the thing we spent the last forty minutes on. The LLM is the last step, and honestly the easy one. When a RAG chatbot gives a stupid answer, it is usually not the LLM&rsquo;s fault. It&rsquo;s that retrieval handed it the wrong five chunks.&rdquo;</p>
 
-        <p>Then thirty seconds of &ldquo;where you&rsquo;ve already met this,&rdquo; so it stops feeling academic: Spotify&rsquo;s recommendations, YouTube&rsquo;s next-video, Google understanding a badly-typed query, duplicate-ticket detection, resume&ndash;JD matching, and every &ldquo;chat with your docs&rdquo; startup of the last two years.</p>
+        <p>Close with a twenty-second name-drop, so it stops feeling academic: Spotify recommendations, YouTube&rsquo;s next video, Google understanding a badly-typed query, duplicate-ticket detection, resume&ndash;JD matching, and every &ldquo;chat with your docs&rdquo; startup of the last two years. Fast list, no elaboration &mdash; the five steps above are what carries this block.</p>
+
+        <p class="say">&ldquo;And remember what we saw in Run 3b &mdash; when retrieval picks wrong, the LLM confidently answers the wrong question. That&rsquo;s most &lsquo;the AI hallucinated&rsquo; complaints in production. It&rsquo;s a retrieval bug wearing a costume.&rdquo;</p>
       </div>
     </article>
 
@@ -852,18 +905,40 @@ for a, b in pairs:
   <!-- ================= APPENDIX ================= -->
   <section class="appendix">
     <h2>Pre-flight</h2>
-    <p>Do all of this the day before, not an hour before. The two things that kill live demos are a model download and a package install.</p>
+    <p>Every number in this plan has been executed and verified, so the demo itself is no longer the risk. What&rsquo;s left is environment and stagecraft. Do it the day before, not an hour before.</p>
+
+    <div class="run">
+      <div class="cap">environment &middot; already set up in this repo</div>
+<pre><code>python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+.\.venv\Scripts\python.exe -m pip install sentence-transformers pandas</code></pre>
+    </div>
+
+    <p>The CPU-only torch index matters: it pulls ~122 MB instead of ~2.5 GB for the CUDA build, and CPU is all this session needs.</p>
 
     <ul class="checklist">
-      <li><span><code>pip install sentence-transformers pandas</code> in a clean venv, and note the versions that worked.</span></li>
-      <li><span>Run <code>SentenceTransformer("all-MiniLM-L6-v2")</code> once so the ~80 MB model is cached locally. Then <strong>turn off your wifi and run the whole notebook again</strong> &mdash; it should still work end to end.</span></li>
-      <li><span>Execute every cell in order and <strong>screenshot each output</strong>. If anything fails live, you paste the screenshot and keep talking. Never debug in front of an audience.</span></li>
-      <li><span>Verify Run 3&rsquo;s ranking actually favours the password article; tune the query or corpus until the contrast is unmissable.</span></li>
+      <li><span>Run <code>SentenceTransformer("all-MiniLM-L6-v2")</code> once so the ~80 MB model is cached. Then <strong>turn off your wifi and run the whole notebook again</strong> &mdash; it must work end to end offline.</span></li>
+      <li><span>Execute every cell in order and <strong>screenshot each output</strong>. If anything fails live, paste the screenshot and keep talking. Never debug in front of an audience.</span></li>
+      <li><span>Confirm your scores match the verified outputs in the plan. A mismatch means a different model or a major-version bump &mdash; find out now, not on stage.</span></li>
       <li><span>Bump the editor font to ~16&ndash;18 pt. Half your audience is on a phone.</span></li>
-      <li><span>Clear all outputs before you present, so results appear live rather than being pre-spoiled.</span></li>
+      <li><span>Clear all outputs before you present, so results appear live rather than pre-spoiled.</span></li>
       <li><span>Close Slack, email, and notifications. Screen-share the notebook window only, not the full desktop.</span></li>
       <li><span>Have the FAQ list on a separate always-visible slide, so people can follow Run 3 without scrolling code.</span></li>
+      <li><span>Rehearse the first 90 seconds out loud until it needs no notes.</span></li>
     </ul>
+
+    <h3>Verified on</h3>
+    <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td>Model</td><td class="num">all-MiniLM-L6-v2, 384 dims</td></tr>
+          <tr><td>Python</td><td class="num">3.12.10, CPU only</td></tr>
+          <tr><td>torch</td><td class="num">2.13.0+cpu</td></tr>
+          <tr><td>Platform</td><td class="num">Windows 11</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Scores from this model are deterministic, so a re-run reproduces them exactly. Swap the model or bump <code>sentence-transformers</code> a major version and they will shift &mdash; re-verify if you do either.</p>
 
     <h2 style="margin-top:52px;">Questions you will get</h2>
     <p>Six of these are near-certain with this audience. Have the answers loaded &mdash; especially the honest &ldquo;we don&rsquo;t fully know&rdquo; ones.</p>
@@ -912,6 +987,16 @@ for a, b in pairs:
     </details>
 
     <details>
+      <summary>If cosine similarity can rank the wrong thing first, how do real systems cope?</summary>
+      <div>
+        <p>Run 3b earns you this question &mdash; take it, it&rsquo;s a good one. Three answers, in the order teams actually reach for them:</p>
+        <p><strong>Rerank.</strong> Retrieve the top 20 by cosine, then pass each candidate through a cross-encoder that reads query and document <em>together</em>. Far slower per pair, so you only run it on 20, not on a million. Big accuracy win.</p>
+        <p><strong>Hybrid search.</strong> Combine semantic scores with old-fashioned keyword scoring (BM25). Each catches what the other misses &mdash; exact product codes and names are where keyword still wins outright.</p>
+        <p><strong>Better chunking.</strong> Unhelpfully boring and usually the biggest single lever in a real RAG system. If your chunks straddle two topics, no amount of model quality rescues the retrieval.</p>
+      </div>
+    </details>
+
+    <details>
       <summary>Is this what ChatGPT does?</summary>
       <div>
         <p>Related but not the same. Embeddings are one vector per piece of text, used for comparison. A generative LLM uses similar internal representations but is trained to produce the next token. The connection to draw is the RAG one: embeddings choose <em>what the LLM gets to see</em>.</p>
@@ -927,10 +1012,10 @@ for a, b in pairs:
           <tr><th>Cut first</th><th>Reclaims</th><th>Why it&rsquo;s safe</th></tr>
         </thead>
         <tbody>
+          <tr><td>Run 3b (the reranker aside)</td><td class="num">1 min</td><td>Valuable, but Run 3 already landed the main point.</td></tr>
           <tr><td>Run 1 (printing the vector)</td><td class="num">2 min</td><td>Describe it verbally instead. Nice, not load-bearing.</td></tr>
           <tr><td><code>king - man + woman</code></td><td class="num">1&ndash;2 min</td><td>A flourish you already flagged as cherry-picked.</td></tr>
-          <tr><td>Third pair in Run 4</td><td class="num">1 min</td><td>Two opposite pairs already make the point.</td></tr>
-          <tr><td>Real-world products list</td><td class="num">1 min</td><td>The RAG walkthrough carries the relevance on its own.</td></tr>
+          <tr><td>Middle pair in Run 4</td><td class="num">1 min</td><td>The flight pair at 0.800 vs 0.829 carries it alone.</td></tr>
         </tbody>
       </table>
     </div>

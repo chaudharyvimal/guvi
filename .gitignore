@@ -1,2 +1,11 @@
 # Session briefs and other source documents are not mine to redistribute
 *.pdf
+
+# Virtual environment
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

@@ -3,8 +3,11 @@
 A minute-by-minute teaching plan for a 45-minute online session on **embeddings and semantic
 search**, aimed at college students, freshers, and engineers with 1–2 years of experience.
 
-📐 **[meaning-as-geometry.html](meaning-as-geometry.html)** — open it in any browser. It is a single
-self-contained file with no external dependencies, so it works offline.
+📐 **[meaning-as-geometry.html](meaning-as-geometry.html)** — the session plan. Open it in any
+browser; it is a single self-contained file with no external dependencies, so it works offline.
+
+📓 **[embeddings_demo.ipynb](embeddings_demo.ipynb)** — the runnable demo notebook, with every
+output verified.
 
 > Embeddings turn meaning into geometry. Once meaning is geometry, search becomes arithmetic.
 
@@ -18,7 +21,7 @@ self-contained file with no external dependencies, so it works offline.
 | 0:15 | Cosine similarity worked by hand on 2-D vectors |
 | 0:21 | Why averaging word vectors fails (*dog bites man* = *man bites dog*) |
 | 0:24 | Four live demo runs, ending on a deliberate failure case |
-| 0:37 | How this is the retrieval engine inside RAG |
+| 0:38 | How this is the retrieval engine inside RAG |
 | 0:41 | Takeaway assignment and Q&A |
 
 It also carries the words to say for each segment, a pre-flight checklist, seven prepared Q&A
@@ -26,11 +29,15 @@ answers, and a ranked cut-list for when the theory runs long.
 
 ## Running the demos
 
-The hands-on portion needs CPU only — no GPU:
+CPU only — no GPU anywhere in this notebook.
 
 ```bash
-pip install sentence-transformers pandas
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+.\.venv\Scripts\python.exe -m pip install sentence-transformers pandas
 ```
+
+The CPU-only torch index pulls ~122 MB instead of ~2.5 GB for the CUDA build.
 
 Then cache the model once, before presenting, so nothing downloads live:
 
@@ -39,9 +46,34 @@ from sentence_transformers import SentenceTransformer
 SentenceTransformer("all-MiniLM-L6-v2")   # ~80 MB
 ```
 
-The four demo runs are listed in full inside the plan.
+## Verified results
 
-> [!NOTE]
-> The demo code in the plan has not been executed yet, so the exact similarity rankings in Run 3
-> are the intended result rather than a measured one. Run it once before presenting and tune the
-> query or corpus until the keyword-vs-semantic contrast is unmistakable.
+Every score in the plan and notebook was executed on `all-MiniLM-L6-v2` (384 dims), Python
+3.12.10, torch 2.13.0+cpu, Windows 11. Two findings changed the session:
+
+**Semantic search beats keyword search, and keyword fails in the most useful way.** For the query
+*"I can't log in to my account"*, keyword matching hits only on `account` and returns
+*"How do I delete my account permanently?"* — the user asked for help getting in, and it offered to
+destroy their account. Semantic search ranks password-reset first at `0.502`, without the word
+"password" ever appearing in the query.
+
+**But retrieval is not solved, and the plan now shows it.** Rephrase to *"I'm locked out of my
+account"* and the wrong article wins outright:
+
+```
+0.636   How do I delete my account permanently?
+0.539   How do I reset a forgotten password?
+```
+
+That measured failure is in the session as Run 3b, as the motivation for rerankers.
+
+**Embeddings miss negation.** Two opposites score `0.800` — a hair under a genuinely similar pair
+at `0.829`:
+
+```
+0.800   'The flight was on time'  vs  'The flight was delayed'
+0.829   'I love this product'     vs  'This product is wonderful'
+```
+
+Scores from this model are deterministic, so re-running reproduces them exactly. A different model
+or a `sentence-transformers` major-version bump will shift them.
