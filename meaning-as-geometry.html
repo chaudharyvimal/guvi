@@ -1,0 +1,949 @@
+<title>Meaning as Geometry</title>
+
+<style>
+  /* ---------- tokens: light is the base ---------- */
+  :root {
+    --paper:      #F6F7FA;
+    --surface:    #FFFFFF;
+    --ink:        #14171E;
+    --ink-soft:   #3D4453;
+    --muted:      #6A7284;
+    --rule:       #DCE0E8;
+    --rule-soft:  #E9ECF1;
+    --accent:     #9A6410;
+    --accent-ink: #7A4E08;
+    --accent-bg:  #FAF1DF;
+    --alert:      #A83A33;
+    --alert-bg:   #FBEDEB;
+    --code-bg:    #FBFCFD;
+
+    --f-ui: "Segoe UI Variable Display", "Segoe UI", -apple-system, system-ui, sans-serif;
+    --f-body: "Segoe UI Variable Text", "Segoe UI", -apple-system, system-ui, sans-serif;
+    --f-say: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    --f-mono: "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #101318;
+      --surface:    #171B22;
+      --ink:        #E7EAF0;
+      --ink-soft:   #C2C8D4;
+      --muted:      #8D96A6;
+      --rule:       #272D38;
+      --rule-soft:  #1E232B;
+      --accent:     #E3A344;
+      --accent-ink: #F0BC6C;
+      --accent-bg:  #2A2113;
+      --alert:      #EE8B82;
+      --alert-bg:   #2E1A18;
+      --code-bg:    #12161C;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #101318;
+    --surface:    #171B22;
+    --ink:        #E7EAF0;
+    --ink-soft:   #C2C8D4;
+    --muted:      #8D96A6;
+    --rule:       #272D38;
+    --rule-soft:  #1E232B;
+    --accent:     #E3A344;
+    --accent-ink: #F0BC6C;
+    --accent-bg:  #2A2113;
+    --alert:      #EE8B82;
+    --alert-bg:   #2E1A18;
+    --code-bg:    #12161C;
+  }
+
+  /* ---------- base ---------- */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16.5px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: clamp(28px, 5vw, 64px) clamp(18px, 4vw, 40px) 96px;
+  }
+
+  h1, h2, h3 { font-family: var(--f-ui); text-wrap: balance; margin: 0; }
+
+  a { color: var(--accent-ink); }
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 22px; }
+
+  .masthead h1 {
+    font-size: clamp(30px, 5.2vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.022em;
+    font-weight: 650;
+    margin: 10px 0 12px;
+  }
+
+  .standfirst {
+    font-family: var(--f-say);
+    font-size: clamp(16.5px, 2.1vw, 19.5px);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin-top: 22px;
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .facts b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ---------- thesis ---------- */
+  .thesis {
+    margin: 40px 0 0;
+    padding: 24px 26px;
+    background: var(--accent-bg);
+    border-left: 3px solid var(--accent);
+  }
+  .thesis p {
+    margin: 8px 0 0;
+    font-family: var(--f-say);
+    font-size: clamp(17px, 2.3vw, 21px);
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  /* ---------- arc strip ---------- */
+  .arc { margin-top: 52px; }
+
+  .arc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    margin-top: 16px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+
+  .arc-cell {
+    background: var(--surface);
+    padding: 14px 15px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .arc-cell .len {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--accent-ink);
+  }
+  .arc-cell .nm {
+    font-family: var(--f-ui);
+    font-weight: 620;
+    font-size: 14.5px;
+    line-height: 1.25;
+  }
+  .arc-cell .gist { font-size: 13px; line-height: 1.4; color: var(--muted); }
+
+  /* ---------- timeline ---------- */
+  .timeline { margin-top: 60px; }
+
+  .block {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+    gap: 0 28px;
+    padding: 30px 0 34px;
+    border-top: 1px solid var(--rule);
+  }
+  .block:first-of-type { border-top: 2px solid var(--ink); }
+
+  .clock {
+    font-family: var(--f-mono);
+    font-variant-numeric: tabular-nums;
+    position: sticky;
+    top: 20px;
+    align-self: start;
+  }
+  .clock .t {
+    display: block;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .clock .d {
+    display: block;
+    margin-top: 3px;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+
+  .block > .body { min-width: 0; }
+
+  .block h2 {
+    font-size: clamp(20px, 2.7vw, 25px);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    font-weight: 640;
+    margin-bottom: 4px;
+  }
+
+  .goal {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+  .goal b {
+    color: var(--accent-ink);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .body > p { margin: 0 0 14px; max-width: 66ch; }
+  .body > ul, .body > ol { margin: 0 0 16px; padding-left: 22px; max-width: 66ch; }
+  .body li { margin-bottom: 7px; }
+  .body li::marker { color: var(--muted); }
+
+  strong { font-weight: 640; color: var(--ink); }
+
+  /* --- the things you SAY --- */
+  .say {
+    font-family: var(--f-say);
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--ink);
+    border-left: 2px solid var(--accent);
+    padding: 2px 0 2px 18px;
+    margin: 0 0 16px;
+    max-width: 62ch;
+  }
+  .say + .say { margin-top: -6px; }
+
+  /* --- audience interaction --- */
+  .ask {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    align-items: baseline;
+    margin: 0 0 16px;
+    padding: 13px 16px;
+    background: var(--accent-bg);
+    max-width: 66ch;
+  }
+  .ask .lbl {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  .ask p { margin: 0; font-size: 15.5px; line-height: 1.5; }
+
+  /* --- risk / caution --- */
+  .watch {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    align-items: baseline;
+    margin: 0 0 16px;
+    padding: 13px 16px;
+    background: var(--alert-bg);
+    max-width: 66ch;
+  }
+  .watch .lbl {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--alert);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  .watch p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--ink-soft); }
+
+  /* --- code --- */
+  .run {
+    margin: 0 0 18px;
+    border: 1px solid var(--rule);
+    background: var(--code-bg);
+  }
+  .run > .cap {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .run pre {
+    margin: 0;
+    padding: 14px;
+    overflow-x: auto;
+    font-family: var(--f-mono);
+    font-size: 13px;
+    line-height: 1.62;
+    color: var(--ink-soft);
+    tab-size: 4;
+  }
+  code {
+    font-family: var(--f-mono);
+    font-size: 0.895em;
+    background: var(--rule-soft);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .run code { background: none; padding: 0; }
+
+  /* --- the board: hand-worked maths --- */
+  .board {
+    margin: 0 0 18px;
+    padding: 20px 22px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    overflow-x: auto;
+  }
+  .board .step {
+    font-family: var(--f-mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    font-variant-numeric: tabular-nums;
+    white-space: pre;
+    color: var(--ink-soft);
+  }
+  .board .punch {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule-soft);
+    font-family: var(--f-mono);
+    font-size: 14px;
+    color: var(--accent-ink);
+    font-weight: 600;
+    white-space: pre-wrap;
+  }
+
+  /* --- data table --- */
+  .tbl-scroll { overflow-x: auto; margin: 0 0 18px; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 460px;
+    font-size: 14.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--rule);
+  }
+  td.num {
+    font-family: var(--f-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* ---------- appendix ---------- */
+  .appendix { margin-top: 76px; border-top: 2px solid var(--ink); padding-top: 30px; }
+  .appendix h2 {
+    font-size: clamp(22px, 3vw, 27px);
+    letter-spacing: -0.015em;
+    font-weight: 640;
+    margin-bottom: 20px;
+  }
+  .appendix h3 {
+    font-size: 16.5px;
+    font-weight: 640;
+    margin: 30px 0 10px;
+  }
+  .appendix > p, .appendix > ul, .appendix > ol { max-width: 66ch; }
+  .appendix ul, .appendix ol { padding-left: 22px; }
+  .appendix li { margin-bottom: 8px; }
+
+  details {
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 4px 0;
+  }
+  summary {
+    cursor: pointer;
+    padding: 11px 0;
+    font-family: var(--f-ui);
+    font-weight: 600;
+    font-size: 15.5px;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "+";
+    font-family: var(--f-mono);
+    color: var(--accent-ink);
+    display: inline-block;
+    width: 20px;
+    font-weight: 600;
+  }
+  details[open] > summary::before { content: "\2212"; }
+  details > div { padding: 0 0 14px 20px; }
+  details > div p { margin: 0 0 10px; max-width: 62ch; font-size: 15.5px; }
+  details > div p:last-child { margin-bottom: 0; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 11px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    margin: 0;
+  }
+  .checklist li::before {
+    content: "\2610";
+    font-family: var(--f-mono);
+    color: var(--accent);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .signoff {
+    margin-top: 60px;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-say);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 60ch;
+  }
+
+  @media (max-width: 620px) {
+    .block { grid-template-columns: 1fr; gap: 0; }
+    .clock { position: static; display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+    .clock .d { margin-top: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">Demo session &middot; Topic 9 &middot; Generative AI track</div>
+    <h1>Embeddings &amp; Semantic Search</h1>
+    <p class="standfirst">Teaching a computer that &ldquo;I can&rsquo;t sign in&rdquo; and &ldquo;I forgot my password&rdquo; mean the same thing &mdash; and that nothing about it is magic.</p>
+    <div class="facts">
+      <span><b>45 min</b> &middot; online</span>
+      <span><b>Audience</b> college students, freshers, 1&ndash;2 yrs</span>
+      <span><b>Stack</b> Python, sentence-transformers, CPU only</span>
+      <span><b>Interaction beats</b> 4</span>
+    </div>
+  </header>
+
+  <section class="thesis">
+    <div class="eyebrow">The one line they should leave with</div>
+    <p>Embeddings turn meaning into geometry. Once meaning is geometry, search becomes arithmetic.</p>
+  </section>
+
+  <section class="arc">
+    <div class="eyebrow">The arc</div>
+    <div class="arc-grid">
+      <div class="arc-cell">
+        <span class="len">4 MIN</span>
+        <span class="nm">Break the search box</span>
+        <span class="gist">Show the failure before the fix.</span>
+      </div>
+      <div class="arc-cell">
+        <span class="len">17 MIN</span>
+        <span class="nm">Meaning as coordinates</span>
+        <span class="gist">Vectors, then cosine, worked by hand.</span>
+      </div>
+      <div class="arc-cell">
+        <span class="len">13 MIN</span>
+        <span class="nm">Live demo</span>
+        <span class="gist">Four runs, ending on a failure case.</span>
+      </div>
+      <div class="arc-cell">
+        <span class="len">4 MIN</span>
+        <span class="nm">This is RAG&rsquo;s engine</span>
+        <span class="gist">Connect to what they want to build.</span>
+      </div>
+      <div class="arc-cell">
+        <span class="len">7 MIN</span>
+        <span class="nm">Takeaway &amp; Q&amp;A</span>
+        <span class="gist">One assignment, then hands up.</span>
+      </div>
+    </div>
+  </section>
+
+  <main class="timeline">
+
+    <!-- ================= 1 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:00</span><span class="d">4 min</span></div>
+      <div class="body">
+        <h2>Hook: the search box that lies to you</h2>
+        <p class="goal"><b>Goal</b> &nbsp;They feel the problem in their gut before they hear a single definition.</p>
+
+        <p>Do <strong>not</strong> open with &ldquo;today we&rsquo;ll learn about embeddings.&rdquo; Open with a broken product. Share your screen on a plain text file or slide showing a help-centre FAQ list, and a search box you type into.</p>
+
+        <p class="say">&ldquo;Quick show of hands in the chat &mdash; who has ever searched a company&rsquo;s help page, known for a fact the answer was in there, and still got nothing? Type 1 in the chat.&rdquo;</p>
+
+        <p>Let the 1s roll in for ten seconds. Then show it happening.</p>
+
+        <p class="say">&ldquo;Here&rsquo;s a support page with eight articles. I&rsquo;m a user. I type what&rsquo;s actually in my head: <em>I can&rsquo;t sign in to my account.</em> And the search gives me&hellip; &lsquo;How do I delete my account permanently?&rsquo; I asked for help getting in. It offered to destroy my account.&rdquo;</p>
+
+        <p>That laugh is your buy-in. Now name the villain.</p>
+
+        <p class="say">&ldquo;The search wasn&rsquo;t broken. It did exactly what it was built to do &mdash; match the letters I typed. The only word my sentence shares with any article is &lsquo;account&rsquo;. It has no idea that <em>sign in</em> and <em>password</em> live in the same universe. It matches spelling. I wanted it to match meaning.&rdquo;</p>
+
+        <div class="ask">
+          <span class="lbl">Ask the chat</span>
+          <p>&ldquo;So how would <em>you</em> fix this? Drop one idea in the chat.&rdquo; You will get &ldquo;synonyms&rdquo; and &ldquo;a dictionary&rdquo; &mdash; use them in the next block.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= 2 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:04</span><span class="d">3 min</span></div>
+      <div class="body">
+        <h2>Why the obvious fix doesn&rsquo;t scale</h2>
+        <p class="goal"><b>Goal</b> &nbsp;Close the escape hatches so the real solution feels necessary, not arbitrary.</p>
+
+        <p>Take the chat&rsquo;s answers seriously and kill them one at a time. This is the move that separates a teacher from a slide-reader.</p>
+
+        <ul>
+          <li><strong>&ldquo;Add a synonym list.&rdquo;</strong> Fine &mdash; you write it. <em>login, log in, log-in, sign in, signin, sign-in, can&rsquo;t get in, locked out, credentials not working.</em> Now do that for every concept in your product, in every language, forever. And it still fails on a phrasing nobody predicted.</li>
+          <li><strong>&ldquo;Use a thesaurus / WordNet.&rdquo;</strong> Better, but it&rsquo;s word-by-word. It has no view on whether a whole <em>sentence</em> means the same thing as another whole sentence.</li>
+          <li><strong>&ldquo;Just use ChatGPT.&rdquo;</strong> Someone will say this. Good &mdash; ask them how the model knows which eight articles to look at. Park it: &ldquo;hold that thought, it&rsquo;s where we finish.&rdquo;</li>
+        </ul>
+
+        <p>Then state the session&rsquo;s question and leave it on screen.</p>
+
+        <p class="say">&ldquo;So the real question for the next forty minutes is this: how do you get a computer &mdash; which only does arithmetic &mdash; to decide that two sentences with <em>no words in common</em> mean the same thing?&rdquo;</p>
+      </div>
+    </article>
+
+    <!-- ================= 3 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:07</span><span class="d">8 min</span></div>
+      <div class="body">
+        <h2>Meaning as coordinates</h2>
+        <p class="goal"><b>Goal</b> &nbsp;&ldquo;Embedding&rdquo; stops being jargon and becomes an obvious idea they could have had themselves.</p>
+
+        <p>Start somewhere they already know cold. Colour.</p>
+
+        <p class="say">&ldquo;Forget AI for a second. How does a computer store the colour red? Three numbers &mdash; 255, 0, 0. And here&rsquo;s the part that matters: 254, 2, 1 is <em>also</em> red. Nobody told the computer those are both red. It falls out of the fact that the two sets of numbers are <em>close together</em>. We turned a human concept into coordinates, and closeness in those coordinates became similarity. That is the entire trick we&rsquo;re about to play on language.&rdquo;</p>
+
+        <p>Now build it up on words, one dimension at a time. Draw this live if you can &mdash; a whiteboard, or just two axes on a slide.</p>
+
+        <ul>
+          <li>Take one made-up dimension: <strong>&ldquo;how food-ish is this word?&rdquo;</strong> 0 to 1. Place <em>pizza</em> at 0.95, <em>biryani</em> at 0.95, <em>laptop</em> at 0.05.</li>
+          <li>Now <em>coffee</em> and <em>Java</em> both score high on food-ish. Problem. So add a second dimension: <strong>&ldquo;how programming-ish?&rdquo;</strong> Now <em>Java</em> separates from <em>coffee</em>, because it sits high on both.</li>
+          <li>Land the generalisation: one number can&rsquo;t hold a meaning. Two is better. The model we&rsquo;ll use has <strong>384</strong>.</li>
+        </ul>
+
+        <div class="ask">
+          <span class="lbl">Ask the chat</span>
+          <p>&ldquo;If I plot <em>coffee</em>, <em>tea</em>, and <em>laptop</em> on these two axes &mdash; which two end up as neighbours?&rdquo; Everyone gets it right. That&rsquo;s the point: <em>they</em> just did an embedding lookup in their head.</p>
+        </div>
+
+        <p>Now correct the one thing they&rsquo;re about to get wrong, because it&rsquo;s the question that always comes.</p>
+
+        <p class="say">&ldquo;Obvious next question: who sat down and defined those 384 dimensions? Nobody. That&rsquo;s the whole point. The model was trained on an enormous amount of text with a stupidly simple job &mdash; guess the missing word. To get good at that, it had no choice but to invent its own internal dimensions of meaning. And here&rsquo;s the honest part: we mostly can&rsquo;t read them. Dimension 137 doesn&rsquo;t say &lsquo;food-ish&rsquo;. It says 0.0413, and nobody knows exactly why. Those learned coordinates are what we call an <strong>embedding</strong>.&rdquo;</p>
+
+        <p>If you want the classic flourish, do <code>king - man + woman &asymp; queen</code> here &mdash; but be straight about it:</p>
+
+        <div class="watch">
+          <span class="lbl">Be honest</span>
+          <p>The king/queen analogy is a real property but a heavily cherry-picked one; most word-arithmetic you try yourself will disappoint. Say that out loud. Nothing buys credibility with a sharp fresher faster than volunteering the limits of your own demo.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= 4 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:15</span><span class="d">6 min</span></div>
+      <div class="body">
+        <h2>Cosine similarity, worked by hand</h2>
+        <p class="goal"><b>Goal</b> &nbsp;They can compute a similarity score on paper. Then <code>util.cos_sim</code> is a convenience, not a black box.</p>
+
+        <p>They have coordinates. Now they need a measuring tape. Start with the wrong tool, because the comparison is what teaches.</p>
+
+        <p class="say">&ldquo;Obvious idea: measure the straight-line distance between two points, like school geometry. It works&hellip; until it doesn&rsquo;t. Imagine a two-line tweet about cricket and a four-thousand-word article about cricket. Same topic, wildly different length &mdash; so their vectors point the same way, but one arrow is much longer than the other. Straight-line distance says they&rsquo;re far apart. They&rsquo;re not. They&rsquo;re just different sizes.&rdquo;</p>
+
+        <p class="say">&ldquo;So we throw length away and keep only <em>direction</em>. Measure the <strong>angle</strong> between the two arrows. That&rsquo;s cosine similarity. Zero degrees &mdash; same direction &mdash; scores 1.0. Ninety degrees, unrelated, scores 0. Opposite, &minus;1.&rdquo;</p>
+
+        <p>Now do the arithmetic in front of them with tiny fake vectors. Two dimensions: <em>&ldquo;access-ish&rdquo;</em> and <em>&ldquo;food-ish&rdquo;</em>. Nobody gets bored during four multiplications, and it permanently kills the idea that this is magic.</p>
+
+        <div class="board">
+<div class="step">          "log in"  =  [0.9, 0.1]
+          "sign in" =  [0.8, 0.2]
+          "pizza"   =  [0.1, 0.9]
+
+cos(A,B)  =  (A . B) / (|A| * |B|)
+
+log in  vs  sign in
+  A . B  =  0.9*0.8 + 0.1*0.2  =  0.74
+  |A|    =  sqrt(0.81 + 0.01)  =  0.906
+  |B|    =  sqrt(0.64 + 0.04)  =  0.825
+  cos    =  0.74 / 0.747       =  0.99
+
+log in  vs  pizza
+  A . B  =  0.9*0.1 + 0.1*0.9  =  0.18
+  |A|    =  0.906   |B| = 0.906
+  cos    =  0.18 / 0.82        =  0.22</div>
+<div class="punch">0.99  vs  0.22  &mdash; and not one shared letter did any work.</div>
+        </div>
+
+        <p class="say">&ldquo;That&rsquo;s it. That&rsquo;s the algorithm. Multiply, add, divide. Everything else today is the same four lines of arithmetic, just with 384 numbers instead of 2 &mdash; and with the numbers learned by a model instead of made up by me.&rdquo;</p>
+
+        <div class="watch">
+          <span class="lbl">Expect this</span>
+          <p>Someone will ask what score counts as &ldquo;similar&rdquo;. Answer: there is no universal threshold &mdash; it depends on the model and your data, so you calibrate it on your own examples. Practitioners rank by score and take the top-k far more often than they threshold. Saying &ldquo;you tune it, here&rsquo;s how&rdquo; is a better answer than inventing 0.7.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ================= 5 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:21</span><span class="d">3 min</span></div>
+      <div class="body">
+        <h2>From words to whole sentences</h2>
+        <p class="goal"><b>Goal</b> &nbsp;Justify <code>sentence-transformers</code> before they see the import line.</p>
+
+        <p>One gap left to close, and it sets up the library choice.</p>
+
+        <p class="say">&ldquo;So far I&rsquo;ve talked about single words. But my user typed a sentence. Easy fix &mdash; average the word vectors? Try it: <em>dog bites man</em> and <em>man bites dog</em>. Same three words, so the average is <strong>identical</strong>. Two very different days, one vector. Averaging throws away word order, and word order is where a lot of meaning lives.&rdquo;</p>
+
+        <p class="say">&ldquo;So instead we use a model that reads the sentence as a sentence &mdash; every word in the context of the others &mdash; and emits one vector for the whole thing. That&rsquo;s a sentence embedding model. The one we&rsquo;re using is <code>all-MiniLM-L6-v2</code>: about 80 MB, runs on this laptop with no GPU, and gives us 384 numbers per sentence.&rdquo;</p>
+
+        <p>Then set the stage for the demo so they know what they&rsquo;re watching for.</p>
+
+        <p class="say">&ldquo;Four things now, live. First I&rsquo;ll show you the actual numbers. Then that similar things score high. Then I&rsquo;ll fix the broken search from the start of the session. And then &mdash; because you should never trust a demo where everything works &mdash; I&rsquo;ll show you how to break it.&rdquo;</p>
+      </div>
+    </article>
+
+    <!-- ================= 6 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:24</span><span class="d">13 min</span></div>
+      <div class="body">
+        <h2>Live demo &mdash; four runs</h2>
+        <p class="goal"><b>Goal</b> &nbsp;Payoff, then honesty. Every cell pre-run once before the session so the model is cached and nothing downloads on stage.</p>
+
+        <p><strong>Cell 0 &mdash; already executed before you start sharing.</strong> Never make an audience watch a model download.</p>
+
+        <div class="run">
+          <div class="cap">setup &middot; run before the session</div>
+<pre><code>from sentence_transformers import SentenceTransformer, util
+model = SentenceTransformer("all-MiniLM-L6-v2")</code></pre>
+        </div>
+
+        <h3 style="font-family:var(--f-ui);font-size:16px;font-weight:640;margin:26px 0 8px;">Run 1 &mdash; look at the actual numbers <span style="font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400;">&nbsp;2 min</span></h3>
+
+        <div class="run">
+          <div class="cap">demo 1 &middot; demystify</div>
+<pre><code>v = model.encode("king")
+print(v.shape)          # (384,)
+print(v[:8].round(3))</code></pre>
+        </div>
+
+        <p class="say">&ldquo;There it is. That&rsquo;s the word &lsquo;king&rsquo;, as far as the machine is concerned. Three hundred and eighty-four numbers, and I&rsquo;m showing you the first eight. This is the whole thing. There is no meaning hiding anywhere else &mdash; no dictionary, no rules file. Just this list. Everything else we do today is arithmetic on lists like this one.&rdquo;</p>
+
+        <h3 style="font-family:var(--f-ui);font-size:16px;font-weight:640;margin:26px 0 8px;">Run 2 &mdash; similar things score high <span style="font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400;">&nbsp;3 min</span></h3>
+
+        <p>Six sentences, two obvious clusters. <strong>Make them predict before you run it</strong> &mdash; prediction is what turns watching into learning.</p>
+
+        <div class="run">
+          <div class="cap">demo 2 &middot; similarity matrix</div>
+<pre><code>sentences = [
+    "I love eating pizza",
+    "Pasta is my favourite food",
+    "This restaurant serves great biryani",
+    "Python is a programming language",
+    "I write code every day",
+    "Debugging takes most of my time",
+]
+
+emb = model.encode(sentences)
+sim  = util.cos_sim(emb, emb)
+
+import pandas as pd
+print(pd.DataFrame(sim.numpy().round(2),
+                   index=[s[:24] for s in sentences],
+                   columns=range(6)))</code></pre>
+        </div>
+
+        <div class="ask">
+          <span class="lbl">Ask the chat</span>
+          <p>&ldquo;Before I hit run &mdash; sentence 0 is about pizza, sentence 3 is about Python. High score or low? And what about 0 and 2, pizza vs biryani, which share <em>zero</em> words?&rdquo;</p>
+        </div>
+
+        <p>When it runs, point at the two bright blocks on the diagonal, then at the one number that proves the whole session: pizza vs biryani, no shared words, high score.</p>
+
+        <p class="say">&ldquo;Look at row 0, column 2. &lsquo;I love eating pizza&rsquo; and &lsquo;This restaurant serves great biryani&rsquo;. Not a single word in common. Ctrl+F would score that a flat zero. We&rsquo;re getting a high number, because the meanings point the same way.&rdquo;</p>
+
+        <h3 style="font-family:var(--f-ui);font-size:16px;font-weight:640;margin:26px 0 8px;">Run 3 &mdash; fix the search box from minute one <span style="font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400;">&nbsp;5 min</span></h3>
+
+        <p>This is the emotional peak of the session. Same eight FAQs, same query, both methods side by side.</p>
+
+        <div class="run">
+          <div class="cap">demo 3 &middot; keyword vs semantic</div>
+<pre><code>faq = [
+    "How do I reset a forgotten password?",
+    "The app crashes when I upload a photo.",
+    "What is your refund and return policy?",
+    "How long does standard shipping take?",
+    "Can I change the email on my profile?",
+    "My card was declined at checkout.",
+    "How do I delete my account permanently?",
+    "Is there a student discount available?",
+]
+faq_emb = model.encode(faq, convert_to_tensor=True)
+
+query = "I can't sign in to my account"
+
+# ---------- the old way ----------
+STOP = {"i", "my", "to", "the", "a", "is", "in", "do", "how", "can", "can't"}
+clean = lambda s: {w.strip("?.,'") for w in s.lower().split()} - STOP
+
+print("KEYWORD SEARCH")
+for f in faq:
+    if clean(query) & clean(f):
+        print("   ", f)
+
+# ---------- the new way ----------
+q_emb = model.encode(query, convert_to_tensor=True)
+print("\nSEMANTIC SEARCH")
+for hit in util.semantic_search(q_emb, faq_emb, top_k=3)[0]:
+    print(f"   {hit['score']:.3f}   {faq[hit['corpus_id']]}")</code></pre>
+        </div>
+
+        <p>Keyword search matches only on <code>account</code> &mdash; so it confidently returns <em>&ldquo;How do I delete my account permanently?&rdquo;</em>. Semantic search should put the password-reset article on top, having never seen the word &ldquo;password&rdquo; in the query.</p>
+
+        <p class="say">&ldquo;Same eight articles. Same question. The old search found something &mdash; it found the <em>wrong</em> thing, and it offered to delete my account. The new one put &lsquo;reset a forgotten password&rsquo; at the top, and notice: my question never contained the word &lsquo;password&rsquo;. Not once. It matched on meaning. That&rsquo;s the session.&rdquo;</p>
+
+        <div class="watch">
+          <span class="lbl">Verify first</span>
+          <p>These exact rankings are the plan&rsquo;s intent, not a measured result &mdash; I have not executed this code. Run it once before the session. If password-reset doesn&rsquo;t come out on top, adjust the query (&ldquo;I&rsquo;m locked out and can&rsquo;t get in&rdquo;) or trim the competing <code>account</code> lines until the contrast is clean, then freeze the corpus and don&rsquo;t touch it.</p>
+        </div>
+
+        <h3 style="font-family:var(--f-ui);font-size:16px;font-weight:640;margin:26px 0 8px;">Run 4 &mdash; now break it on purpose <span style="font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:400;">&nbsp;3 min</span></h3>
+
+        <p>Most demo sessions stop at the win. Ending on a limitation is what makes you read as a practitioner rather than someone who followed a tutorial last night.</p>
+
+        <div class="run">
+          <div class="cap">demo 4 &middot; the failure mode</div>
+<pre><code>pairs = [
+    ("I love this product",     "I hate this product"),
+    ("The flight was on time",  "The flight was delayed"),
+    ("I love this product",     "This product is wonderful"),
+]
+
+for a, b in pairs:
+    s = util.cos_sim(model.encode(a), model.encode(b)).item()
+    print(f"{s:.3f}   {a!r}  vs  {b!r}")</code></pre>
+        </div>
+
+        <p>The first two pairs are opposites, and they will still score high &mdash; often close to the genuinely-similar third pair.</p>
+
+        <p class="say">&ldquo;&lsquo;I love this product&rsquo; and &lsquo;I hate this product&rsquo; are scoring high. They mean opposite things. Why? Because these vectors capture <em>what a sentence is about</em>, far better than they capture <em>which side of it you&rsquo;re on</em>. Love and hate show up in near-identical contexts in the training text, so they land near each other. So: never build a sentiment classifier out of raw cosine similarity, and if your search has to respect a &lsquo;not&rsquo;, embeddings alone will not save you.&rdquo;</p>
+
+        <p class="say">&ldquo;Every technique you learn has an edge like this. The engineers who get hired are the ones who know where the edge is.&rdquo;</p>
+      </div>
+    </article>
+
+    <!-- ================= 7 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:37</span><span class="d">4 min</span></div>
+      <div class="body">
+        <h2>You just built the engine inside RAG</h2>
+        <p class="goal"><b>Goal</b> &nbsp;Convert a neat trick into something they recognise from job posts. This is the block that makes them stay for your next session.</p>
+
+        <p>Now cash in the &ldquo;just use ChatGPT&rdquo; comment you parked at minute five.</p>
+
+        <p class="say">&ldquo;Someone asked earlier why we don&rsquo;t just hand this to an LLM. Here&rsquo;s the answer. An LLM has a limited context window and it has never read your company&rsquo;s documents. You cannot paste ten thousand pages into it. So how does a &lsquo;chat with your PDF&rsquo; product actually work? It does exactly what we just did.&rdquo;</p>
+
+        <p>Walk five steps. Keep it as five words on screen, not a diagram you have to explain.</p>
+
+        <ol>
+          <li><strong>Chunk</strong> &mdash; split the documents into paragraph-sized pieces.</li>
+          <li><strong>Embed</strong> &mdash; run every chunk through the model we just used. <em>Same line of code.</em></li>
+          <li><strong>Store</strong> &mdash; keep the vectors in FAISS, Chroma, pgvector, Pinecone.</li>
+          <li><strong>Retrieve</strong> &mdash; embed the user&rsquo;s question, cosine-similarity it against everything, take the top 5. <em>This is literally Run 3.</em></li>
+          <li><strong>Generate</strong> &mdash; paste those 5 chunks into the prompt: &ldquo;answer using only this context.&rdquo;</li>
+        </ol>
+
+        <p class="say">&ldquo;That&rsquo;s Retrieval-Augmented Generation. The R and the A &mdash; the retrieval, the part that decides <em>what the model is even allowed to look at</em> &mdash; is the thing we spent the last forty minutes on. The LLM is the last step, and honestly the easy one. When a RAG chatbot gives a stupid answer, it is usually not the LLM&rsquo;s fault. It&rsquo;s that retrieval handed it the wrong five chunks.&rdquo;</p>
+
+        <p>Then thirty seconds of &ldquo;where you&rsquo;ve already met this,&rdquo; so it stops feeling academic: Spotify&rsquo;s recommendations, YouTube&rsquo;s next-video, Google understanding a badly-typed query, duplicate-ticket detection, resume&ndash;JD matching, and every &ldquo;chat with your docs&rdquo; startup of the last two years.</p>
+      </div>
+    </article>
+
+    <!-- ================= 8 ================= -->
+    <article class="block">
+      <div class="clock"><span class="t">0:41</span><span class="d">4 min</span></div>
+      <div class="body">
+        <h2>One assignment, then hands up</h2>
+        <p class="goal"><b>Goal</b> &nbsp;Something small enough that they actually do it tonight, and it lands on a portfolio.</p>
+
+        <p>Give one task, not a reading list. Make it personal data &mdash; people finish projects about their own stuff.</p>
+
+        <p class="say">&ldquo;Tonight, thirty minutes. Take any hundred lines of text you already own &mdash; your notes, a CSV of movie plots, your own WhatsApp export, the titles of every problem you&rsquo;ve solved on LeetCode. Embed them with the two lines I showed you. Then search them by meaning. When a query with none of the right keywords finds the right line, you&rsquo;ll get it in a way no slide can give you. And that&rsquo;s a portfolio project, not a tutorial.&rdquo;</p>
+
+        <p>Restate the thesis, exactly as you said it at the start. Repetition at the close is what survives the week.</p>
+
+        <p class="say">&ldquo;Embeddings turn meaning into geometry. And once meaning is geometry, search is just arithmetic.&rdquo;</p>
+
+        <p>Then open the floor. Read questions aloud before answering &mdash; half the room can&rsquo;t see the chat.</p>
+
+        <div class="watch">
+          <span class="lbl">If nobody talks</span>
+          <p>Silence online is normal, not failure. Have a seed question ready: &ldquo;the one I get asked most is whether you need a GPU for this &mdash; you don&rsquo;t, everything you saw ran on CPU.&rdquo; Answering an unasked question reliably unblocks the real ones.</p>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- ================= APPENDIX ================= -->
+  <section class="appendix">
+    <h2>Pre-flight</h2>
+    <p>Do all of this the day before, not an hour before. The two things that kill live demos are a model download and a package install.</p>
+
+    <ul class="checklist">
+      <li><span><code>pip install sentence-transformers pandas</code> in a clean venv, and note the versions that worked.</span></li>
+      <li><span>Run <code>SentenceTransformer("all-MiniLM-L6-v2")</code> once so the ~80 MB model is cached locally. Then <strong>turn off your wifi and run the whole notebook again</strong> &mdash; it should still work end to end.</span></li>
+      <li><span>Execute every cell in order and <strong>screenshot each output</strong>. If anything fails live, you paste the screenshot and keep talking. Never debug in front of an audience.</span></li>
+      <li><span>Verify Run 3&rsquo;s ranking actually favours the password article; tune the query or corpus until the contrast is unmissable.</span></li>
+      <li><span>Bump the editor font to ~16&ndash;18 pt. Half your audience is on a phone.</span></li>
+      <li><span>Clear all outputs before you present, so results appear live rather than being pre-spoiled.</span></li>
+      <li><span>Close Slack, email, and notifications. Screen-share the notebook window only, not the full desktop.</span></li>
+      <li><span>Have the FAQ list on a separate always-visible slide, so people can follow Run 3 without scrolling code.</span></li>
+    </ul>
+
+    <h2 style="margin-top:52px;">Questions you will get</h2>
+    <p>Six of these are near-certain with this audience. Have the answers loaded &mdash; especially the honest &ldquo;we don&rsquo;t fully know&rdquo; ones.</p>
+
+    <details>
+      <summary>Do I need a GPU?</summary>
+      <div>
+        <p>No. Everything in this session runs on CPU in a couple of seconds. MiniLM is ~80 MB. You need a GPU for <em>training</em> large models, not for embedding a few thousand sentences with a small pretrained one.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>What do the 384 numbers actually mean?</summary>
+      <div>
+        <p>Individually, mostly nothing we can name. They&rsquo;re learned, not designed. Interpretability research does find readable directions inside these spaces, but you should not expect dimension 137 to have a clean English label. What&rsquo;s reliable is <em>relative</em> position: which vectors sit near which.</p>
+        <p>Say &ldquo;we don&rsquo;t fully know&rdquo; where it&rsquo;s true. It teaches them that honesty is part of the job.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>How is this different from Word2Vec / GloVe?</summary>
+      <div>
+        <p>Those give one fixed vector per word, so <em>bank</em> gets the same vector in &ldquo;river bank&rdquo; and &ldquo;bank loan&rdquo;. Transformer-based models are contextual &mdash; the vector changes with the surrounding words &mdash; and sentence-transformers are additionally fine-tuned so that <em>whole-sentence</em> vectors are directly comparable with cosine similarity.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Does this work for Hindi, Tamil, Telugu, Bengali?</summary>
+      <div>
+        <p>Not with the model in this demo &mdash; MiniLM is English-focused. You want a multilingual model such as <code>paraphrase-multilingual-MiniLM-L12-v2</code> or a LaBSE-family model. Worth knowing that with a good multilingual model, the same sentence in two languages lands in nearly the same place &mdash; so you can search Hindi documents with an English query. That fact reliably gets an audible reaction.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>What if I have a million documents? Isn&rsquo;t comparing against all of them slow?</summary>
+      <div>
+        <p>Yes, and that is exactly what vector databases exist for. Brute-force cosine over everything is fine up to roughly tens of thousands of items. Past that you use approximate nearest-neighbour indexes (FAISS, HNSW) which trade a sliver of accuracy for enormous speed. Good moment to name-drop FAISS, Chroma, pgvector, Pinecone, Qdrant &mdash; these appear in job descriptions.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Which model should I pick?</summary>
+      <div>
+        <p>Don&rsquo;t guess from a leaderboard alone &mdash; but do point them at the MTEB leaderboard on Hugging Face as the standard starting reference. Practical advice: start with the smallest model that clears your bar, measure on <em>your</em> data with <em>your</em> queries, and only then pay for something bigger. Bigger embeddings cost storage, latency, and money on every single query.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Is this what ChatGPT does?</summary>
+      <div>
+        <p>Related but not the same. Embeddings are one vector per piece of text, used for comparison. A generative LLM uses similar internal representations but is trained to produce the next token. The connection to draw is the RAG one: embeddings choose <em>what the LLM gets to see</em>.</p>
+      </div>
+    </details>
+
+    <h2 style="margin-top:52px;">If time slips</h2>
+    <p>Something always runs long &mdash; usually the theory, because it goes well. Decide the cut order <em>now</em>, while you&rsquo;re calm, not at minute 34.</p>
+
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th>Cut first</th><th>Reclaims</th><th>Why it&rsquo;s safe</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Run 1 (printing the vector)</td><td class="num">2 min</td><td>Describe it verbally instead. Nice, not load-bearing.</td></tr>
+          <tr><td><code>king - man + woman</code></td><td class="num">1&ndash;2 min</td><td>A flourish you already flagged as cherry-picked.</td></tr>
+          <tr><td>Third pair in Run 4</td><td class="num">1 min</td><td>Two opposite pairs already make the point.</td></tr>
+          <tr><td>Real-world products list</td><td class="num">1 min</td><td>The RAG walkthrough carries the relevance on its own.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Never cut these</h3>
+    <ul>
+      <li><strong>Run 3</strong> &mdash; the keyword-vs-semantic contrast. Without it there is no payoff.</li>
+      <li><strong>The hand-worked cosine</strong> &mdash; the only thing standing between your audience and &ldquo;it&rsquo;s magic.&rdquo;</li>
+      <li><strong>Run 4</strong> &mdash; the failure case is your credibility.</li>
+      <li><strong>The RAG connection</strong> &mdash; the reason this audience cares at all.</li>
+    </ul>
+
+    <p class="signoff">Rehearse the first ninety seconds until it&rsquo;s automatic. Once the hook lands and the chat starts moving, the other forty-three minutes take care of themselves.</p>
+  </section>
+
+</div>
