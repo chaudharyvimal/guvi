@@ -3,11 +3,17 @@
 A minute-by-minute teaching plan for a 45-minute online session on **embeddings and semantic
 search**, aimed at college students, freshers, and engineers with 1–2 years of experience.
 
-📐 **[meaning-as-geometry.html](meaning-as-geometry.html)** — the session plan. Open it in any
-browser; it is a single self-contained file with no external dependencies, so it works offline.
+## Three files, two of them audience-facing
 
-📓 **[embeddings_demo.ipynb](embeddings_demo.ipynb)** — the runnable demo notebook, with every
-output verified.
+| File | Share on screen? | Used |
+| --- | --- | --- |
+| 📐 [session-plan.html](session-plan.html) — the session plan | **No** — it's the script | throughout |
+| 🎞 [slides.html](slides.html) — the deck | Yes | 0:00–0:24, 0:38–0:45 |
+| 📓 [embeddings_demo.ipynb](embeddings_demo.ipynb) — the demo | Yes | 0:24–0:38 |
+
+The plan carries stage directions, a cut list, and prepared Q&A, so it stays on a second screen.
+Both HTML files are single self-contained pages with no external dependencies — they work offline.
+In the deck: arrow keys to move, `t` to flip theme, `f` for fullscreen, swipe on a phone.
 
 > Embeddings turn meaning into geometry. Once meaning is geometry, search becomes arithmetic.
 
